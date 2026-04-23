@@ -1,0 +1,11 @@
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #f6f4f0;
+  color: #0f1b2d;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+button { font-family: inherit; }
