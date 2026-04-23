@@ -63,6 +63,45 @@ editor/
 └── package.json
 ```
 
+## Déploiement sur Railway
+
+Le projet est prêt pour Railway. Deux réglages importants parce que
+l'app vit dans un **sous-dossier** du repo :
+
+1. **Nouveau service → Deploy from GitHub repo** → choisir le repo
+   `cboyaltea/gama` et la branche voulue.
+2. Dans les réglages du service :
+   - **Root Directory** : `editor`
+   - **Branch** : celle que tu veux déployer
+   - **Variables** : ajouter `ANTHROPIC_API_KEY` (et optionnellement
+     `ANTHROPIC_MODEL`). Railway fournit automatiquement `PORT`.
+3. **Networking → Generate Domain** pour obtenir une URL publique.
+
+Railway détecte Next.js via Nixpacks et applique `railway.json` :
+
+- `build` : `npm run build`
+- `start` : `npm run start` (écoute sur `$PORT`, bind `0.0.0.0`)
+- Healthcheck sur `/`
+
+Pour (re)déployer : `git push` sur la branche configurée, Railway
+redéploie tout seul.
+
+### Via la CLI Railway (optionnel)
+
+```bash
+npm i -g @railway/cli
+railway login
+railway link                # associer le projet Railway
+railway up                   # build + deploy depuis le dossier courant
+railway variables set ANTHROPIC_API_KEY=sk-ant-...
+```
+
+### Coûts à prévoir
+
+Railway facture au temps d'exécution + RAM. Une app Next.js idle
+consomme peu, mais vérifie ton plan ($5/mois de crédit offert sur le
+plan Hobby au moment d'écrire).
+
 ## Pistes d'évolution
 
 - **Persistance serveur** : remplacer `localStorage` par une base (Supabase,
