@@ -65,8 +65,8 @@ editor/
 
 ## Déploiement sur Railway
 
-Le projet est prêt pour Railway. Deux réglages importants parce que
-l'app vit dans un **sous-dossier** du repo :
+Le projet est prêt pour Railway via **Dockerfile** (pas Nixpacks) — build
+reproductible, image plus petite, aucun secret injecté au build.
 
 1. **Nouveau service → Deploy from GitHub repo** → choisir le repo
    `cboyaltea/gama` et la branche voulue.
@@ -75,13 +75,19 @@ l'app vit dans un **sous-dossier** du repo :
    - **Branch** : celle que tu veux déployer
    - **Variables** : ajouter `ANTHROPIC_API_KEY` (et optionnellement
      `ANTHROPIC_MODEL`). Railway fournit automatiquement `PORT`.
-3. **Networking → Generate Domain** pour obtenir une URL publique.
+3. Bonne pratique — pour `ANTHROPIC_API_KEY` : dans Railway, clique la
+   variable puis **décoche "Available during build"** (ou marque-la
+   comme *secret*). Notre Dockerfile ne la lit qu'au runtime, donc elle
+   n'a aucune raison d'être exposée au build.
+4. **Networking → Generate Domain** pour obtenir une URL publique.
 
-Railway détecte Next.js via Nixpacks et applique `railway.json` :
+Le build suit `editor/Dockerfile` :
 
-- `build` : `npm run build`
-- `start` : `npm run start` (écoute sur `$PORT`, bind `0.0.0.0`)
+- `node:20-alpine`, multi-stage (deps → builder → runner)
+- Next.js sortie `standalone` pour une image minimale
+- Utilisateur non-root `nextjs`
 - Healthcheck sur `/`
+- Port 3000 (Railway injecte `$PORT`, Next.js lit `PORT` + `HOSTNAME`)
 
 Pour (re)déployer : `git push` sur la branche configurée, Railway
 redéploie tout seul.
