@@ -109,7 +109,7 @@ Bun.serve({
     if (REDIRECTS[p]) return Response.redirect((url.hostname === "localhost" ? url.origin : CANON) + REDIRECTS[p], 301);
 
     // Fichiers statiques
-    if (/^\/(site\.css|site\.js|favicon\.svg|logo\.svg|robots\.txt|sitemap\.xml|img\/[a-z0-9-]+\.webp)$/.test(p)) {
+    if (/^\/(site\.css|site\.js|favicon\.svg|logo\.svg|robots\.txt|sitemap\.xml|llms\.txt|img\/[a-z0-9-]+\.webp)$/.test(p)) {
       const b = await load(p.slice(1));
       if (!b) return text("Not found", 404, TYPES.txt);
       const ext = p.split(".").pop() || "";

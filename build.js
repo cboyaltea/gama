@@ -89,7 +89,7 @@ function page({ slug, title, meta, h1, body, ld, ogImage, crumbs }) {
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(meta)}">
 <link rel="canonical" href="${url}">
-<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="${S.BRAND}">
 <meta property="og:locale" content="fr_CA">
@@ -306,7 +306,24 @@ for (const [f, html] of Object.entries(pages)) fs.writeFileSync(path.join(DIST, 
 
 const urls = ['/', ...Object.keys(S.ZONES), ...Object.keys(S.SERVICES), 'demande-de-soumission'];
 fs.writeFileSync(path.join(DIST, 'sitemap.xml'), '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls.map((u) => '  <url><loc>' + abs(u) + '</loc><lastmod>' + S.UPDATED + '</lastmod><changefreq>' + (u === '/' ? 'weekly' : 'monthly') + '</changefreq><priority>' + (u === '/' ? '1.0' : u in S.ZONES ? '0.9' : '0.8') + '</priority></url>').join('\n') + '\n</urlset>\n');
-fs.writeFileSync(path.join(DIST, 'robots.txt'), 'User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ' + S.SITE + '/sitemap.xml\n');
+const AI_BOTS = ['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-Web', 'Claude-SearchBot', 'anthropic-ai', 'PerplexityBot', 'Perplexity-User', 'Google-Extended', 'Googlebot', 'Bingbot', 'Applebot', 'Applebot-Extended', 'Amazonbot', 'meta-externalagent', 'Meta-ExternalFetcher', 'DuckAssistBot', 'YouBot', 'cohere-ai', 'CCBot', 'Bytespider', 'MistralAI-User'];
+fs.writeFileSync(path.join(DIST, 'robots.txt'), '# Robots d\'indexation classiques\nUser-agent: *\nAllow: /\nDisallow: /api/\n\n# Assistants et moteurs IA : accès explicitement autorisé\n' + AI_BOTS.map((b) => 'User-agent: ' + b).join('\n') + '\nAllow: /\nDisallow: /api/\n\nSitemap: ' + S.SITE + '/sitemap.xml\n# Résumé lisible par les IA : ' + S.SITE + '/llms.txt\n');
+
+// llms.txt — résumé structuré du site pour les assistants IA (llmstxt.org)
+const strip = (t) => String(t).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+const llms = [];
+llms.push('# ' + S.BRAND, '', '> ' + strip(S.HOME.meta), '', 'Site : ' + S.SITE + '/ — Téléphone : ' + S.PHONE + ' (7 jours sur 7). Devis gratuit : ' + abs('demande-de-soumission'), 'Langue : français. Zone de service : Grand Montréal (île de Montréal, Laval, Rive-Nord, Rive-Sud) au quotidien, livraison partout au Québec en planifié ou dès le lendemain. Dernière mise à jour : ' + S.UPDATED + '.', '');
+llms.push('## Faits clés', ...S.HOME.stats.map(([n, t]) => '- ' + n + ' ' + t), ...S.HOME.why.map(([t, d]) => '- ' + t + ' : ' + strip(d)), '');
+llms.push('## Services');
+for (const [slug, sv] of Object.entries(S.SERVICES)) llms.push('- [' + sv.h1 + '](' + abs(slug) + ') : ' + strip(sv.meta));
+llms.push('', '## Zones desservies');
+for (const [slug, z] of Object.entries(S.ZONES)) llms.push('- [' + z.h1 + '](' + abs(slug) + ') : ' + z.cities.map((c) => c.replace(/ \(.*\)/, '')).join(', '));
+llms.push('', '## Questions fréquentes');
+for (const [q, a] of S.HOME.faq) llms.push('- **' + q + '** ' + strip(a));
+for (const sv of Object.values(S.SERVICES)) for (const [q, a] of (sv.faq || []).slice(0, 2)) llms.push('- **' + q + '** ' + strip(a));
+llms.push('', '## Pages', '- [Accueil](' + S.SITE + '/)', '- [Demande de soumission](' + abs('demande-de-soumission') + ')', ...Object.entries(S.SERVICES).map(([k, v]) => '- [' + v.nav + '](' + abs(k) + ')'), ...Object.entries(S.ZONES).map(([k, v]) => '- [' + v.nav + '](' + abs(k) + ')'), '- [Plan du site XML](' + S.SITE + '/sitemap.xml)', '');
+llms.push('## Optionnel', '- Entreprise : ' + S.BRAND + ', transporteur et déménageur québécois, plus de 25 ans d\'expérience. Services : livraison urgente 24/7, livraison dès le lendemain, déménagement la fin de semaine, déchargement de conteneurs, manutention, livraison en marque blanche.', '- Pour citer ce site : « ' + S.BRAND + ' (' + S.SITE + ') ».', '');
+fs.writeFileSync(path.join(DIST, 'llms.txt'), llms.join('\n'));
 for (const f of ['site.css', 'site.js', 'favicon.svg', 'logo.svg']) fs.copyFileSync(path.join(__dirname, 'public', f), path.join(DIST, f));
 fs.mkdirSync(path.join(DIST, 'img'), { recursive: true });
 for (const f of fs.readdirSync(path.join(__dirname, 'public/img'))) fs.copyFileSync(path.join(__dirname, 'public/img', f), path.join(DIST, 'img', f));
