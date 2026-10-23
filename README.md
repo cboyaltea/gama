@@ -1,37 +1,25 @@
-# Groupe Gama — Site web
+# groupegama.ca
 
-Site web statique pour Groupe Gama. Cinq pages HTML, une feuille de style
-partagée et un script d'interactions légères (menu mobile, animations au
-défilement, soumission de formulaire côté client).
+Site de Groupe Gama (livraison, déménagement, manutention — Montréal, Laval, Rive-Nord, Rive-Sud). Français, 11 pages, SEO complet.
 
 ## Structure
 
-```
-.
-├── index.html         # Accueil
-├── services.html      # Services détaillés
-├── projets.html       # Portfolio de réalisations
-├── a-propos.html      # Mission, vision, valeurs, historique
-├── contact.html       # Formulaire et coordonnées
-└── assets/
-    ├── css/styles.css
-    └── js/main.js
-```
+- `src/site.js` — **tout le contenu** (textes, services, zones, FAQ, métadonnées). C'est le seul fichier à éditer pour changer un texte.
+- `build.js` — génère `dist/` : pages HTML, `sitemap.xml`, `robots.txt`, `routes.json`, copie du CSS/JS/images. Lancer `node build.js` après chaque modification, puis commettre `dist/`.
+- `public/` — `site.css`, `site.js` (menu, formulaire, suivi), `logo.svg`, `favicon.svg`, `img/*.webp`.
+- `railway-function.ts` — serveur Railway (Bun) : sert `dist/` depuis ce dépôt (branche `main`, cache 5 min), URL propres, redirections 301, en-têtes de sécurité, et relaie le formulaire (`POST /api/demande`) vers le webhook Make « GroupeGamawebform » (scénario *Gama Integration Webhooks*).
 
-## Aperçu local
+## URL
 
-Aucune étape de compilation. Ouvrir `index.html` dans le navigateur, ou
-lancer un serveur statique :
+Conservées de l'ancien site Framer : `/`, `/livraison-grand-montreal`, `/livraison-rive-nord-montreal`, `/livraison-rive-sud-montreal`.
+Nouvelles : `/livraison-urgente-montreal`, `/livraison-lendemain-quebec`, `/demenagement-montreal`, `/manutention-dechargement-conteneurs`, `/livraison-marque-blanche`, `/distribution-publicitaire-montreal`, `/demande-de-soumission`.
+`www` → apex, barres finales et anciennes variantes → 301 (voir `REDIRECTS` dans la fonction).
 
-```bash
-python3 -m http.server 8000
-# puis ouvrir http://localhost:8000
-```
+## Déploiement
 
-## À personnaliser
+Railway, projet `sites-web`, service `groupegama-web`. Un `git push` sur `main` (avec `dist/` régénéré) met le site à jour en ≤ 5 min, sans redéploiement. La fonction n'est à redéployer que si `railway-function.ts` change.
 
-Le contenu actuel (textes, projets fictifs, coordonnées) est un gabarit.
-Le site de référence `groupegama.ca` n'était pas accessible depuis
-l'environnement de construction (restriction réseau). Remplacer les
-textes, images et coordonnées par les éléments réels dès leur
-disponibilité.
+## Mesure
+
+- Umami (projet Railway `analytics`) : site `groupegama.ca`. Événements : `clic_telephone`, `clic_soumission`, `demande_envoyee`.
+- AlteaSEO pixel (`site_mibyif16_8muag7`) et balise de vérification Google Search Console conservés de l'ancien site.
