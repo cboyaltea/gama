@@ -74,7 +74,7 @@ Bun.serve({
     // Canonique : www → apex, barre finale retirée, minuscules
     if (url.hostname.startsWith("www.")) return Response.redirect(CANON + p + url.search, 301);
     if (p.length > 1 && p.endsWith("/")) return Response.redirect(CANON + p.replace(/\/+$/, "") + url.search, 301);
-    if (p !== p.toLowerCase()) p = p.toLowerCase();
+    if (p !== p.toLowerCase()) return Response.redirect((url.hostname === "localhost" ? url.origin : CANON) + p.toLowerCase() + url.search, 301);
     if (REDIRECTS[p]) return Response.redirect((url.hostname === "localhost" ? url.origin : CANON) + REDIRECTS[p], 301);
 
     // Fichiers statiques
