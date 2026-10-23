@@ -7,7 +7,7 @@ Site de Groupe Gama (livraison, déménagement, manutention — Montréal, Laval
 - `src/site.js` — **tout le contenu** (textes, services, zones, FAQ, métadonnées). C'est le seul fichier à éditer pour changer un texte.
 - `build.js` — génère `dist/` : pages HTML, `sitemap.xml`, `robots.txt`, `routes.json`, copie du CSS/JS/images. Lancer `node build.js` après chaque modification, puis commettre `dist/`.
 - `public/` — `site.css`, `site.js` (menu, formulaire, suivi), `logo.svg`, `favicon.svg`, `img/*.webp`.
-- `railway-function.ts` — serveur Railway (Bun) : sert `dist/` depuis ce dépôt (branche `main`, cache 5 min), URL propres, redirections 301, en-têtes de sécurité, et relaie le formulaire (`POST /api/demande`) vers le webhook Make « GroupeGamawebform » (scénario *Gama Integration Webhooks*).
+- `railway-function.ts` — serveur Railway (Bun) : sert `dist/` depuis ce dépôt (branche `main`, cache 5 min), URL propres, redirections 301, en-têtes de sécurité, et traite le formulaire (`POST /api/demande`) : courriel direct via Gmail/Google Workspace (variables `GMAIL_USER`, `GMAIL_APP_PASSWORD`, `FORM_TO` = destinataires séparés par des virgules, `FORM_ACK=0` pour désactiver l'accusé de réception au client) **et**, en parallèle, webhook Make « GroupeGamawebform » (`FORM_WEBHOOK` ; vide pour le désactiver). L'envoi réussit si l'un des deux canaux passe.
 
 ## URL
 
