@@ -4,19 +4,32 @@
 import nodemailer from "nodemailer@6";
 const RAW = Bun.env.GITHUB_RAW || "https://raw.githubusercontent.com/cboyaltea/gama/main/dist/";
 const TTL = (parseInt(Bun.env.CACHE_MINUTES || "5", 10)) * 60 * 1000;
-const WEBHOOK = Bun.env.FORM_WEBHOOK || "https://hook.us1.make.com/zmffcg235snr2vmpwbsmb34f8yxkjihm";
+const WEBHOOK = Bun.env.FORM_WEBHOOK === undefined ? "https://hook.us1.make.com/zmffcg235snr2vmpwbsmb34f8yxkjihm" : Bun.env.FORM_WEBHOOK; // vide = Make désactivé
 const CANON = "https://groupegama.ca";
 // Courriel direct (Gmail / Google Workspace, mot de passe d'application) ; Make reste appelé en parallèle si FORM_WEBHOOK est défini.
 const GMAIL_USER = Bun.env.GMAIL_USER || "";
 const GMAIL_PASS = Bun.env.GMAIL_APP_PASSWORD || "";
 const FORM_TO = (Bun.env.FORM_TO || "cboy@altea.ca,bruno.gandolfo@hotmail.com").split(",").map((x) => x.trim()).filter(Boolean);
 const FORM_ACK = (Bun.env.FORM_ACK || "1") !== "0"; // accusé de réception au client
+const RESEND_KEY = Bun.env.RESEND_API_KEY || "";
+const FROM_ADDR = Bun.env.FORM_FROM || (GMAIL_USER || "demandes@groupegama.ca");
 const mailer = GMAIL_USER && GMAIL_PASS ? nodemailer.createTransport({ host: "smtp.gmail.com", port: 465, secure: true, auth: { user: GMAIL_USER, pass: GMAIL_PASS }, connectionTimeout: 15000, greetingTimeout: 10000, socketTimeout: 20000 }) : null;
 const escH = (v: string) => v.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string));
 function mailHtml(p: Record<string, string>) {
   const row = (k: string, v: string) => v ? `<tr><td style="padding:6px 12px 6px 0;color:#4B5A50;white-space:nowrap;vertical-align:top">${k}</td><td style="padding:6px 0;font-weight:600">${escH(v).replace(/\n/g, "<br>")}</td></tr>` : "";
   return `<div style="font-family:Arial,sans-serif;font-size:15px;color:#0F1A14;max-width:640px"><h2 style="margin:0 0 4px;color:#06361B">Nouvelle demande — ${escH(p.Service)}</h2><p style="margin:0 0 16px;color:#4B5A50">Reçue le ${escH(p.Date)} via groupegama.ca</p><table style="border-collapse:collapse">${row("Nom", p.Name)}${row("Courriel", p.Email)}${row("Téléphone", p.Phone)}${row("Récupération / adresse du service", p.from)}${row("Livraison", p.to)}</table><h3 style="margin:18px 0 6px;color:#06361B">Détails</h3><div style="white-space:pre-wrap;background:#F6F8F6;border-radius:10px;padding:14px">${escH(p.Demande)}</div><p style="margin:18px 0 0;color:#4B5A50;font-size:13px">Répondre à ce courriel écrit directement au client (${escH(p.Email)}).</p></div>`;
 }
+// Envoi : Resend (API HTTP) si RESEND_API_KEY, sinon Gmail SMTP, sinon rien.
+async function sendMail(m: { to: string[]; subject: string; text: string; html: string; replyTo?: string; fromName: string }) {
+  if (RESEND_KEY) {
+    const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { authorization: "Bearer " + RESEND_KEY, "content-type": "application/json" }, body: JSON.stringify({ from: `${m.fromName} <${FROM_ADDR}>`, to: m.to, reply_to: m.replyTo, subject: m.subject, text: m.text, html: m.html }) });
+    if (!r.ok) throw new Error("resend " + r.status + " " + (await r.text()).slice(0, 200));
+    return;
+  }
+  if (mailer) { await mailer.sendMail({ from: `"${m.fromName}" <${FROM_ADDR}>`, to: m.to, replyTo: m.replyTo, subject: m.subject, text: m.text, html: m.html }); return; }
+  throw new Error("aucun expéditeur configuré (RESEND_API_KEY ou GMAIL_USER/GMAIL_APP_PASSWORD)");
+}
+const canMail = () => Boolean(RESEND_KEY || mailer);
 const TYPES: Record<string, string> = { html: "text/html; charset=utf-8", css: "text/css; charset=utf-8", js: "text/javascript; charset=utf-8", svg: "image/svg+xml", webp: "image/webp", png: "image/png", jpg: "image/jpeg", txt: "text/plain; charset=utf-8", xml: "application/xml; charset=utf-8", json: "application/json; charset=utf-8" };
 const SEC: Record<string, string> = {
   "x-content-type-options": "nosniff",
@@ -78,13 +91,13 @@ Bun.serve({
       if (!payload.Name || !payload.Email || !payload.Phone || !payload.Service || !payload.Demande) return Response.json({ ok: false, error: "champs" }, { status: 400 });
       const page = d.page ? s(d.page, 100) : "";
       const results = await Promise.allSettled([
-        mailer ? mailer.sendMail({ from: `"Groupe Gama — site web" <${GMAIL_USER}>`, to: FORM_TO, replyTo: payload.Email, subject: `Nouvelle demande — ${payload.Service} — ${payload.Name}`, text: `Service : ${payload.Service}\nNom : ${payload.Name}\nCourriel : ${payload.Email}\nTéléphone : ${payload.Phone}\nRécupération : ${payload.from}\nLivraison : ${payload.to}\nDate : ${payload.Date}\n\n${payload.Demande}`, html: mailHtml(payload) }) : Promise.reject(new Error("gmail non configuré")),
+        sendMail({ fromName: "Groupe Gama — site web", to: FORM_TO, replyTo: payload.Email, subject: `Nouvelle demande — ${payload.Service} — ${payload.Name}`, text: `Service : ${payload.Service}\nNom : ${payload.Name}\nCourriel : ${payload.Email}\nTéléphone : ${payload.Phone}\nRécupération : ${payload.from}\nLivraison : ${payload.to}\nDate : ${payload.Date}\n\n${payload.Demande}`, html: mailHtml(payload) }),
         WEBHOOK ? fetch(WEBHOOK, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...payload, Demande: payload.Demande + (page ? "\n\n(Envoyé depuis " + CANON + page + ")" : "") }) }).then((r) => { if (!r.ok) throw new Error("hook " + r.status); }) : Promise.reject(new Error("webhook désactivé")),
       ]);
       const ok = results.some((r) => r.status === "fulfilled");
-      results.forEach((r, i) => { if (r.status === "rejected") console.error("[form] " + (i ? "make" : "gmail") + " : " + (r.reason && r.reason.message)); });
-      if (ok && mailer && FORM_ACK && results[0].status === "fulfilled") {
-        mailer.sendMail({ from: `"Groupe Gama" <${GMAIL_USER}>`, to: payload.Email, subject: "Nous avons bien reçu votre demande — Groupe Gama", text: `Bonjour ${payload.Name},\n\nMerci pour votre demande (${payload.Service}). Nous vous répondons rapidement avec un prix et une date.\n\nPour une urgence : 514-424-7936.\n\nGroupe Gama\nhttps://groupegama.ca`, html: `<div style="font-family:Arial,sans-serif;font-size:15px;color:#0F1A14;max-width:560px"><p>Bonjour ${escH(payload.Name)},</p><p>Merci pour votre demande (<b>${escH(payload.Service)}</b>). Nous vous répondons rapidement avec un prix et une date.</p><p>Pour une urgence : <a href="tel:+15144247936">514-424-7936</a>.</p><p style="color:#4B5A50">Groupe Gama · <a href="https://groupegama.ca">groupegama.ca</a></p></div>` }).catch((e: any) => console.error("[form] accusé : " + e.message));
+      results.forEach((r, i) => { if (r.status === "rejected") console.error("[form] " + (i ? "make" : "courriel") + " : " + (r.reason && r.reason.message)); });
+      if (ok && canMail() && FORM_ACK && results[0].status === "fulfilled") {
+        sendMail({ fromName: "Groupe Gama", to: [payload.Email], subject: "Nous avons bien reçu votre demande — Groupe Gama", text: `Bonjour ${payload.Name},\n\nMerci pour votre demande (${payload.Service}). Nous vous répondons rapidement avec un prix et une date.\n\nPour une urgence : 514-424-7936.\n\nGroupe Gama\nhttps://groupegama.ca`, html: `<div style="font-family:Arial,sans-serif;font-size:15px;color:#0F1A14;max-width:560px"><p>Bonjour ${escH(payload.Name)},</p><p>Merci pour votre demande (<b>${escH(payload.Service)}</b>). Nous vous répondons rapidement avec un prix et une date.</p><p>Pour une urgence : <a href="tel:+15144247936">514-424-7936</a>.</p><p style="color:#4B5A50">Groupe Gama · <a href="https://groupegama.ca">groupegama.ca</a></p></div>` }).catch((e: any) => console.error("[form] accusé : " + e.message));
       }
       return ok ? Response.json({ ok: true }) : Response.json({ ok: false, error: "envoi" }, { status: 502 });
     }
