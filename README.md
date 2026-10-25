@@ -1,11 +1,12 @@
 # groupegama.ca
 
-Site de Groupe Gama (livraison, déménagement, manutention — Montréal, Laval, Rive-Nord, Rive-Sud). Bilingue : français (11 pages, `/`) et anglais (11 pages, `/en/…`), SEO complet.
+Site de Groupe Gama (livraison, déménagement, manutention — Montréal, Laval, Rive-Nord, Rive-Sud). Bilingue : français (19 pages, `/`) et anglais (19 pages, `/en/…`), dont 8 pages de villes par langue, SEO complet.
 
 ## Structure
 
 - `src/site.js` — **tout le contenu français** (textes, services, zones, FAQ, métadonnées, images, liens entre pages).
 - `src/site.en.js` — **contenu anglais**, mêmes clés que le français (slug français) + `slug` = URL anglaise sous `/en/`. Images, icônes et liens « services liés » sont repris du français. Changer un texte : le modifier dans les deux fichiers.
+- `src/cities.js` — **pages de villes** (FR + EN côte à côte) : Laval, Longueuil, Brossard, Terrebonne, Boucherville, Blainville, Saint-Laurent, Anjou / est de Montréal. Chaque ville : zone parente, image, villes voisines, intro, points forts, secteurs, accès (ponts/autoroutes), FAQ locale. Ajouter une ville = ajouter une entrée ; menu, pied de page, accueil, pages de zones, sitemap et llms.txt suivent automatiquement.
 - Les textes d'interface (menus, boutons, formulaire) sont dans l'objet `T` de `build.js` (fr / en).
 - `build.js` — génère `dist/` : pages HTML, `sitemap.xml`, `robots.txt`, `routes.json`, copie du CSS/JS/images. Lancer `node build.js` après chaque modification, puis commettre `dist/`.
 - `public/` — `site.css`, `site.js` (menu, formulaire, suivi), `logo.svg`, `favicon.svg`, `img/*.webp`.
@@ -32,8 +33,9 @@ Nouvelles : `/livraison-urgente-montreal`, `/livraison-lendemain-quebec`, `/deme
 | `/livraison-marque-blanche` | `/en/white-label-delivery` |
 | `/distribution-publicitaire-montreal` | `/en/flyer-distribution-montreal` |
 | `/demande-de-soumission` | `/en/request-a-quote` |
+| `/livraison-laval`, `/livraison-longueuil`, `/livraison-brossard`, `/livraison-terrebonne`, `/livraison-boucherville`, `/livraison-blainville`, `/livraison-saint-laurent`, `/livraison-anjou` | `/en/laval-delivery`, `/en/longueuil-delivery`, `/en/brossard-delivery`, `/en/terrebonne-delivery`, `/en/boucherville-delivery`, `/en/blainville-delivery`, `/en/saint-laurent-delivery`, `/en/anjou-east-montreal-delivery` |
 
-- Chaque page a ses `hreflang` (fr-CA, en-CA, x-default = FR) ; le sitemap liste les 22 URL avec leurs alternates ; bouton FR/EN dans l'en-tête, le menu mobile et le pied de page.
+- Chaque page a ses `hreflang` (fr-CA, en-CA, x-default = FR) ; le sitemap liste les 38 URL avec leurs alternates ; bouton FR/EN dans l'en-tête, le menu mobile et le pied de page.
 - Langue automatique (comme les autres sites Railway) : à l'arrivée depuis l'extérieur, un navigateur anglais est redirigé (302) vers la page anglaise équivalente et inversement ; un clic sur le bouton de langue mémorise le choix (cookie `lang`) ; robots jamais redirigés.
 - Formulaire anglais : les valeurs du champ Service restent en français (ce que l'équipe reçoit) ; le courriel à l'équipe indique « client anglophone, répondre en anglais » ; l'accusé de réception au client part en anglais.
 

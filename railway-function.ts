@@ -43,7 +43,7 @@ const SEC: Record<string, string> = {
 const REDIRECTS: Record<string, string> = {
   "/index.html": "/", "/index": "/", "/accueil": "/", "/home": "/",
   "/services": "/#services", "/nos-services": "/#services", "/prix": "/demande-de-soumission", "/contact": "/demande-de-soumission", "/devis": "/demande-de-soumission", "/soumission": "/demande-de-soumission", "/demande-rapide": "/demande-de-soumission",
-  "/livraison-montreal": "/livraison-grand-montreal", "/livraison-rive-nord": "/livraison-rive-nord-montreal", "/livraison-rive-sud": "/livraison-rive-sud-montreal", "/livraison-laval": "/livraison-rive-nord-montreal", "/livraison-longueuil": "/livraison-rive-sud-montreal",
+  "/livraison-montreal": "/livraison-grand-montreal", "/livraison-rive-nord": "/livraison-rive-nord-montreal", "/livraison-rive-sud": "/livraison-rive-sud-montreal",
   "/demenagement": "/demenagement-montreal", "/manutention": "/manutention-dechargement-conteneurs", "/marque-blanche": "/livraison-marque-blanche", "/distribution": "/distribution-publicitaire-montreal", "/livraison-urgente": "/livraison-urgente-montreal",
 };
 

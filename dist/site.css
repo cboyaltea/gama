@@ -90,8 +90,13 @@ p{margin:0 0 1em}.wrap{max-width:var(--max);margin:0 auto;padding:0 20px}.narrow
 
 /* Pied de page */
 footer{background:var(--forest);color:rgba(255,255,255,.82);padding:64px 0 28px}
-.foot{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:40px}@media(max-width:800px){.foot{grid-template-columns:1fr}}
+.foot{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px}@media(max-width:960px){.foot{grid-template-columns:1fr 1fr}}@media(max-width:560px){.foot{grid-template-columns:1fr}}
 footer .logo{color:#fff}footer .mark circle{fill:var(--green-2)}footer h4{color:#fff;font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 14px}
 footer .foot a:not(.logo):not(.tel){display:block;color:rgba(255,255,255,.82);padding:5px 0}footer .foot a:hover{color:#fff}footer .tel{color:var(--lime);margin-top:10px}
 .legal{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;margin-top:44px;padding-top:22px;border-top:1px solid rgba(255,255,255,.14);font-size:14px}.legal a{color:#fff}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+.menu-sep{display:block;margin:8px 12px 2px;padding-top:8px;border-top:1px solid var(--line);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--green)}.mnav .menu-sep{margin:14px 0 6px;padding-top:0;border:0;font-size:13px}
+.city-links{margin-top:18px;line-height:1.9}.city-links a{font-weight:600;color:var(--forest);text-decoration:underline;text-decoration-color:rgba(19,163,74,.35);text-underline-offset:3px}
+.cities li a{color:inherit;font-weight:700;text-decoration:underline;text-decoration-color:rgba(19,163,74,.45);text-underline-offset:3px}
+.dd .menu{max-height:calc(100vh - 100px);overflow:auto}

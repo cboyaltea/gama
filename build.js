@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const S = require('./src/site.js');
 const E = require('./src/site.en.js');
+const { CITIES } = require('./src/cities.js');
 
 const DIST = path.join(__dirname, 'dist');
 fs.rmSync(DIST, { recursive: true, force: true });
@@ -35,11 +36,15 @@ function langData(lang) {
   return { SERVICES: merge(S.SERVICES, E.SERVICES), ZONES: merge(S.ZONES, E.ZONES), ZONE_SERVICES: S.ZONE_SERVICES.map(([, , k], i) => [E.ZONE_SERVICES[i][0], E.ZONE_SERVICES[i][1], k]), HOME: E.HOME, FORM: E.FORM };
 }
 const DATA = { fr: langData('fr'), en: langData('en') };
+const city = (lang, k) => ({ ...CITIES[k], ...CITIES[k][lang] });
+const cityKeys = Object.keys(CITIES);
+const citiesOf = (zone) => cityKeys.filter((k) => CITIES[k].zone === zone);
 // Chemin d'une page : key = '/', 'form' ou slug français d'un service/zone.
 function href(lang, key) {
   if (lang === 'fr') return key === '/' ? '/' : '/' + (key === 'form' ? FR_SLUG_FORM : key);
   if (key === '/') return '/en';
   if (key === 'form') return '/en/' + E.FORM.slug;
+  if (CITIES[key]) return '/en/' + CITIES[key].en.slug;
   return '/en/' + (E.SERVICES[key] || E.ZONES[key]).slug;
 }
 const abs = (p) => S.SITE + p;
@@ -58,6 +63,7 @@ const T = {
     homeWhyH2: 'Une logistique performante, 24 h/24 et 7 j/7', faqH2: 'Questions fréquentes', homeCta: ['Que pouvons-nous faire pour vous ?', 'Soumission gratuite, réponse rapide, 7 jours sur 7.'],
     svcDetail: 'Le service en détail', svcIncluded: 'Ce qui est compris', svcHow: 'Comment ça se passe', svcFaq: (h1) => 'Questions fréquentes sur ' + (h1.toLowerCase().startsWith('service') ? 'le ' : 'la ') + h1.toLowerCase(), svcOthers: 'Autres services Groupe Gama', zonesServed: 'Zones desservies', svcCta: ['Besoin de ce service ?', 'Obtenez un prix et une date aujourd’hui — sans engagement.'], howTo: 'Comment réserver : ',
     zoneKicker: (n) => 'Livraison ' + n, zoneBook: 'Réserver une livraison', zoneThree: 'Trois façons de livrer', zoneThreeH2: (a) => 'Livraison express, planifiée ou sur palette ' + a, zoneServed: (a) => 'Zones desservies ' + a, zoneCities: 'Villes et secteurs', zoneOthers: (a) => 'Nos autres services ' + a, zoneFaq: (h1) => 'Questions fréquentes — ' + h1.toLowerCase(), zoneOtherZones: 'Autres zones', zoneCta: ['Besoin d’une livraison ?', 'Obtenez un devis gratuit ou réservez votre service dès aujourd’hui.'], zoneServiceType: 'Livraison',
+    cities: 'Villes', cityKicker: (n) => 'Livraison ' + n, cityIntroH2: (n) => 'Groupe Gama à ' + n, cityWhy: 'Ce que nous faisons pour vous', cityAccess: 'Accès et délais', citySvcH2: (n) => 'Nos services à ' + n, citySvcP: 'Six services, une seule équipe et un seul numéro, du colis urgent au déménagement.', citySectors: (n) => 'Secteurs desservis à ' + n, cityFaq: (n) => 'Questions fréquentes — ' + n, cityNear: 'Villes voisines', cityZone: 'Voir toute la zone', cityCta: (n) => ['Une livraison à ' + n + ' ?', 'Prix et date confirmés aujourd’hui — soumission gratuite, sans engagement.'], cityBook: 'Demander un prix',
     formKicker: 'Devis gratuit', formTitleSuffix: ' gratuite', fName: 'Nom et prénom', fEmail: 'Courriel', fPhone: 'Téléphone', fService: 'Service', fChoose: 'Choisissez…', fServiceHelp: 'Choisissez bien le service approprié : il détermine l’équipe qui vous répond.', fFrom: 'Adresse de récupération', fTo: 'Adresse de livraison', fStreet: 'Rue, ville', fAddr: 'Adresse du service', fDate: 'Date et heure souhaitées', fDateEx: 'Ex. : samedi 8 novembre, 8 h', fDetails: 'Détails de la demande',
     fHelpDelivery: 'Donnez-nous le plus de détails possible : dimensions, nombre de boîtes et poids (cm ou pouces, lb ou kg) ; pour un déménagement, nombre de pièces (ex. : maison avec 2 chambres et un bureau), service d’emballage oui ou non, nombre d’étages aux deux adresses.', fHelpHandling: 'Décrivez les produits (taille, poids), le temps approximatif et le nombre de personnes souhaité.',
     fConsent: 'En envoyant ce formulaire, vous acceptez d’être contacté par Groupe Gama au sujet de votre demande. Aucune infolettre, aucune revente de données.', fSend: 'Envoyer ma demande', fCallH2: 'Vous préférez parler à quelqu’un ?', fCallP: 'Appelez-nous, 7 jours sur 7 :',
@@ -71,6 +77,7 @@ const T = {
     homeWhyH2: 'Efficient logistics, 24/7', faqH2: 'Frequently asked questions', homeCta: ['What can we do for you?', 'Free quote, fast reply, 7 days a week.'],
     svcDetail: 'The service in detail', svcIncluded: 'What’s included', svcHow: 'How it works', svcFaq: (h1) => 'FAQ — ' + h1.toLowerCase(), svcOthers: 'Other Groupe Gama services', zonesServed: 'Service areas', svcCta: ['Need this service?', 'Get a price and a date today — no obligation.'], howTo: 'How to book: ',
     zoneKicker: (n) => n + ' delivery', zoneBook: 'Book a delivery', zoneThree: 'Three ways to deliver', zoneThreeH2: (a) => 'Express, scheduled or pallet delivery ' + a, zoneServed: (a) => 'Areas served ' + a, zoneCities: 'Cities and areas', zoneOthers: (a) => 'Our other services ' + a, zoneFaq: (h1) => 'FAQ — ' + h1.toLowerCase(), zoneOtherZones: 'Other areas', zoneCta: ['Need a delivery?', 'Get a free quote or book your service today.'], zoneServiceType: 'Delivery',
+    cities: 'Cities', cityKicker: (n) => n + ' delivery', cityIntroH2: (n) => 'Groupe Gama in ' + n, cityWhy: 'What we do for you', cityAccess: 'Access and delivery times', citySvcH2: (n) => 'Our services in ' + n, citySvcP: 'Six services, one team and one phone number, from urgent parcels to moving.', citySectors: (n) => 'Areas served in ' + n, cityFaq: (n) => 'FAQ — ' + n, cityNear: 'Nearby cities', cityZone: 'See the whole area', cityCta: (n) => ['Need a delivery in ' + n + '?', 'Price and date confirmed today — free quote, no obligation.'], cityBook: 'Get a price',
     formKicker: 'Free quote', formTitleSuffix: '', fName: 'Full name', fEmail: 'Email', fPhone: 'Phone', fService: 'Service', fChoose: 'Choose…', fServiceHelp: 'Please choose the right service: it determines which team gets back to you.', fFrom: 'Pickup address', fTo: 'Delivery address', fStreet: 'Street, city', fAddr: 'Service address', fDate: 'Preferred date and time', fDateEx: 'E.g. Saturday, November 8, 8 a.m.', fDetails: 'Request details',
     fHelpDelivery: 'Give us as many details as possible: dimensions, number of boxes and weight (cm or inches, lb or kg); for a move, number of rooms (e.g. house with 2 bedrooms and an office), packing service yes or no, number of floors at both addresses.', fHelpHandling: 'Describe the products (size, weight), the approximate time needed and the number of people you would like.',
     fConsent: 'By sending this form, you agree to be contacted by Groupe Gama about your request. No newsletter, no resale of your data.', fSend: 'Send my request', fCallH2: 'Prefer to talk to someone?', fCallP: 'Call us, 7 days a week:',
@@ -101,7 +108,7 @@ function org(lang) {
 function nav(lang, active) {
   const D = DATA[lang], L = T[lang];
   const links = (obj) => Object.entries(obj).map(([k, s]) => '<a href="' + href(lang, k) + '"' + (active === k ? ' aria-current="page"' : '') + '>' + esc(s.nav) + '</a>').join('');
-  const svc = links(D.SERVICES), zones = links(D.ZONES);
+  const svc = links(D.SERVICES), zones = links(D.ZONES) + '<span class="menu-sep">' + L.cities + '</span>' + cityKeys.map((k) => '<a href="' + href(lang, k) + '"' + (active === k ? ' aria-current="page"' : '') + '>' + esc(city(lang, k).nav) + '</a>').join('');
   const alt = href(other(lang), active);
   const sw = `<a class="lang" href="${alt}" hreflang="${T[other(lang)].locale}" lang="${other(lang)}" title="${L.switchTitle}"><span class="lang-long">${L.switchLabel}</span><span class="lang-short">${L.switchShort}</span></a>`;
   return `<header id="hdr"><div class="wrap bar">
@@ -130,6 +137,7 @@ function footer(lang) {
     <div><a class="logo" href="${href(lang, '/')}">${LOGO}<span>GROUPE <b>GAMA</b></span></a><p>${L.footAbout}</p><a class="tel big" href="tel:${S.PHONE_TEL}">${S.PHONE}</a></div>
     <div><h4>${L.servicesShort}</h4>${svc}</div>
     <div><h4>${L.zonesShort}</h4>${zones}<a href="${href(lang, 'form')}">${L.quote}</a></div>
+    <div><h4>${L.cities}</h4>${cityKeys.map((k) => '<a href="' + href(lang, k) + '">' + esc(L.deliveryZone(city(lang, k).nav)) + '</a>').join('')}</div>
   </div>
   <div class="legal"><span>© ${new Date().getFullYear()} ${S.BRAND}. ${L.rights}</span><span><a href="${href(other(lang), '/')}" hreflang="${T[other(lang)].locale}" lang="${other(lang)}">${L.switchLabel}</a> · ${L.madeBy} <a href="https://altea.ca" rel="noopener">Altea.ca</a></span></div>
 </div></footer>`;
@@ -218,6 +226,7 @@ function home(lang) {
       <h2>${L.homeZoneH2}</h2>
       <p>${L.homeZoneP}</p>
       <div class="chips">${Object.entries(D.ZONES).map(([k, z]) => '<a href="' + href(lang, k) + '">' + esc(z.h1) + ' ' + ARROW + '</a>').join('')}</div>
+      <p class="city-links"><b>${L.cities} :</b> ${cityKeys.map((k) => '<a href="' + href(lang, k) + '">' + esc(city(lang, k).nav) + '</a>').join(' · ')}</p>
     </div>
     <img src="${img('entrepot-aerien')}" alt="${L.homeZoneAlt}" width="1600" height="1067" loading="lazy">
   </div>
@@ -307,7 +316,8 @@ function zonePage(lang, k) {
 <section class="sec alt">
   <div class="wrap split2">
     <article class="prose"><h2>${esc(L.zoneServed(z.area))}</h2><p>${esc(z.zoneText)}</p>
-      <h3>${L.zoneCities}</h3><ul class="cities">${z.cities.map((c) => '<li>' + esc(c) + '</li>').join('')}</ul></article>
+      <h3>${L.zoneCities}</h3><ul class="cities">${z.cities.map((c) => { const ck = cityKeys.find((x) => c.startsWith(city(lang, x).nav.split(' ')[0].replace(/,$/, ''))); return '<li>' + (ck ? '<a href="' + href(lang, ck) + '">' + esc(c) + '</a>' : esc(c)) + '</li>'; }).join('')}</ul>
+      ${citiesOf(k).length ? '<p class="city-links"><b>' + L.cities + ' :</b> ' + citiesOf(k).map((x) => '<a href="' + href(lang, x) + '">' + esc(city(lang, x).h1) + '</a>').join(' · ') + '</p>' : ''}</article>
     <aside class="steps"><h2>${esc(L.zoneOthers(z.area))}</h2><ol>${['demenagement-montreal', 'manutention-dechargement-conteneurs', 'livraison-marque-blanche', 'distribution-publicitaire-montreal'].map((sk) => '<li><b><a href="' + href(lang, sk) + '">' + esc(D.SERVICES[sk].h1) + '</a></b><p>' + esc(D.SERVICES[sk].lead) + '</p></li>').join('')}</ol></aside>
   </div>
 </section>
@@ -317,6 +327,57 @@ function zonePage(lang, k) {
 </section>
 ${ctaBand(lang, L.zoneCta)}`;
   return page(lang, { key: k, title: z.title, meta: z.meta, body, ld, ogImage: z.image, crumbs: [[L.home, abs(href(lang, '/'))], [L.zones, abs(href(lang, '/')) + '#zones'], [z.h1, url]] });
+}
+
+// ——— Pages de villes
+function cityPage(lang, k) {
+  const D = DATA[lang], c = city(lang, k), L = T[lang], z = D.ZONES[c.zone];
+  const url = abs(href(lang, k));
+  const name = c.nav;
+  const ld = [
+    { '@type': 'Service', '@id': url + '#service', name: c.h1, serviceType: L.zoneServiceType, description: c.meta, provider: { '@id': ORG_ID }, url, image: S.SITE + img(c.image), areaServed: { '@type': 'City', name: name.split(/ et | & /)[0], containedInPlace: { '@type': 'AdministrativeArea', name: 'Québec' } }, hasOfferCatalog: { '@type': 'OfferCatalog', name: L.citySvcH2(name), itemListElement: Object.entries(D.SERVICES).map(([sk, sv]) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: sv.h1, url: abs(href(lang, sk)) } })) } },
+    faqLd(c.faq),
+  ];
+  const body = `
+<section class="phero">
+  <div class="wrap split">
+    <div>
+      <nav class="crumbs" aria-label="${L.crumbs}"><a href="${href(lang, '/')}">${L.home}</a><span>›</span><a href="${href(lang, c.zone)}">${esc(z.nav)}</a><span>›</span><span aria-current="page">${esc(name)}</span></nav>
+      <span class="kicker">${icon('truck', 18)} ${esc(L.cityKicker(name))}</span>
+      <h1>${esc(c.h1)}</h1>
+      <p class="lead">${esc(c.lead)}</p>
+      <div class="actions"><a class="btn btn-primary" href="${href(lang, 'form')}?service=Livraison">${L.cityBook} ${ARROW}</a><a class="btn btn-light" href="tel:${S.PHONE_TEL}">${icon('phone', 18)} ${S.PHONE}</a></div>
+    </div>
+    <img src="${img(c.image)}" alt="${esc(c.imageAlt)}" width="1200" height="900" fetchpriority="high">
+  </div>
+</section>
+<section class="sec">
+  <div class="wrap split2">
+    <article class="prose"><h2>${esc(L.cityIntroH2(name))}</h2><p>${esc(c.intro)}</p>
+      <h3>${L.cityWhy}</h3><ul class="checks">${c.highlights.map((p) => '<li>' + CHECK + '<span>' + esc(p) + '</span></li>').join('')}</ul>
+    </article>
+    <aside class="steps"><h2>${L.cityAccess}</h2><p>${esc(c.access)}</p></aside>
+  </div>
+</section>
+<section class="sec alt">
+  <div class="wrap">
+    <div class="sec-head"><h2>${esc(L.citySvcH2(name))}</h2><p>${L.citySvcP}</p></div>
+    <div class="grid3">${Object.keys(D.SERVICES).map((sk) => serviceCard(lang, sk)).join('')}</div>
+  </div>
+</section>
+<section class="sec">
+  <div class="wrap narrow">
+    <h2>${esc(L.citySectors(name))}</h2>
+    <ul class="cities">${c.sectors.map((x) => '<li>' + esc(x) + '</li>').join('')}</ul>
+    <p class="zone-links">${L.cityZone} : <a href="${href(lang, c.zone)}">${esc(z.h1)}</a></p>
+  </div>
+</section>
+<section class="sec alt">
+  <div class="wrap narrow"><div class="sec-head"><span class="kicker">FAQ</span><h2>${esc(L.cityFaq(name))}</h2></div>${faqHtml(c.faq)}${testimonial(lang)}
+  <p class="zone-links">${L.cityNear} : ${c.near.map((n) => '<a href="' + href(lang, n) + '">' + esc(city(lang, n).h1) + '</a>').join(' · ')}</p></div>
+</section>
+${ctaBand(lang, L.cityCta(name))}`;
+  return page(lang, { key: k, title: c.title, meta: c.meta, body, ld, ogImage: c.image, crumbs: [[L.home, abs(href(lang, '/'))], [z.h1, abs(href(lang, c.zone))], [c.h1, url]] });
 }
 
 // ——— Formulaire (les valeurs du champ Service restent en français : c'est ce que l'équipe reçoit)
@@ -367,7 +428,7 @@ function formPage(lang) {
 }
 
 // ——— Écriture
-const KEYS = ['/', ...Object.keys(S.ZONES), ...Object.keys(S.SERVICES), 'form'];
+const KEYS = ['/', ...Object.keys(S.ZONES), ...cityKeys, ...Object.keys(S.SERVICES), 'form'];
 const file = (lang, key) => { const p = href(lang, key); return p === '/' ? 'index.html' : p === '/en' ? 'en/index.html' : p.slice(1) + '.html'; };
 const pages = {};
 for (const lang of ['fr', 'en']) {
@@ -375,11 +436,12 @@ for (const lang of ['fr', 'en']) {
   pages[file(lang, 'form')] = formPage(lang);
   for (const k of Object.keys(S.SERVICES)) pages[file(lang, k)] = servicePage(lang, k);
   for (const k of Object.keys(S.ZONES)) pages[file(lang, k)] = zonePage(lang, k);
+  for (const k of cityKeys) pages[file(lang, k)] = cityPage(lang, k);
 }
 for (const [f, html] of Object.entries(pages)) fs.writeFileSync(path.join(DIST, f), html);
 
 // Sitemap avec alternates hreflang
-const prio = (k) => (k === '/' ? '1.0' : k in S.ZONES ? '0.9' : '0.8');
+const prio = (k) => (k === '/' ? '1.0' : k in S.ZONES || k in CITIES ? '0.9' : '0.8');
 const sm = [];
 for (const lang of ['fr', 'en']) for (const k of KEYS) {
   sm.push('  <url><loc>' + abs(href(lang, k)) + '</loc><lastmod>' + S.UPDATED + '</lastmod><changefreq>' + (k === '/' ? 'weekly' : 'monthly') + '</changefreq><priority>' + prio(k) + '</priority>'
@@ -399,11 +461,13 @@ llms.push('## Services');
 for (const [slug, sv] of Object.entries(S.SERVICES)) llms.push('- [' + sv.h1 + '](' + abs(href('fr', slug)) + ') : ' + strip(sv.meta));
 llms.push('', '## Zones desservies');
 for (const [slug, z] of Object.entries(S.ZONES)) llms.push('- [' + z.h1 + '](' + abs(href('fr', slug)) + ') : ' + z.cities.map((c) => c.replace(/ \(.*\)/, '')).join(', '));
+llms.push('', '## Villes');
+for (const k of cityKeys) llms.push('- [' + CITIES[k].fr.h1 + '](' + abs(href('fr', k)) + ') : ' + strip(CITIES[k].fr.meta));
 llms.push('', '## Questions fréquentes');
 for (const [q, a] of S.HOME.faq) llms.push('- **' + q + '** ' + strip(a));
 for (const sv of Object.values(S.SERVICES)) for (const [q, a] of (sv.faq || []).slice(0, 2)) llms.push('- **' + q + '** ' + strip(a));
 llms.push('', '## Pages', '- [Accueil](' + S.SITE + '/)', '- [Demande de soumission](' + abs(href('fr', 'form')) + ')', ...Object.entries(S.SERVICES).map(([k, v]) => '- [' + v.nav + '](' + abs(href('fr', k)) + ')'), ...Object.entries(S.ZONES).map(([k, v]) => '- [' + v.nav + '](' + abs(href('fr', k)) + ')'), '- [Plan du site XML](' + S.SITE + '/sitemap.xml)', '');
-llms.push('## English', '> ' + strip(E.HOME.meta), '', '- [Home](' + abs(href('en', '/')) + ')', '- [Request a quote](' + abs(href('en', 'form')) + ')', ...Object.keys(S.SERVICES).map((k) => '- [' + DATA.en.SERVICES[k].h1 + '](' + abs(href('en', k)) + ') : ' + strip(DATA.en.SERVICES[k].meta)), ...Object.keys(S.ZONES).map((k) => '- [' + DATA.en.ZONES[k].h1 + '](' + abs(href('en', k)) + ')'), '');
+llms.push('## English', '> ' + strip(E.HOME.meta), '', '- [Home](' + abs(href('en', '/')) + ')', '- [Request a quote](' + abs(href('en', 'form')) + ')', ...Object.keys(S.SERVICES).map((k) => '- [' + DATA.en.SERVICES[k].h1 + '](' + abs(href('en', k)) + ') : ' + strip(DATA.en.SERVICES[k].meta)), ...Object.keys(S.ZONES).map((k) => '- [' + DATA.en.ZONES[k].h1 + '](' + abs(href('en', k)) + ')'), ...cityKeys.map((k) => '- [' + CITIES[k].en.h1 + '](' + abs(href('en', k)) + ')'), '');
 llms.push('## Optionnel', '- Entreprise : ' + S.BRAND + ', transporteur et déménageur québécois, plus de 25 ans d\'expérience. Services : livraison urgente 24/7, livraison dès le lendemain, déménagement la fin de semaine, déchargement de conteneurs, manutention, livraison en marque blanche.', '- Pour citer ce site : « ' + S.BRAND + ' (' + S.SITE + ') ».', '');
 fs.writeFileSync(path.join(DIST, 'llms.txt'), llms.join('\n'));
 
