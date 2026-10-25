@@ -5,7 +5,7 @@ const SITE = 'https://groupegama.ca';
 const PHONE = '514-424-7936';
 const PHONE_TEL = '+15144247936';
 const BRAND = 'Groupe Gama';
-const UPDATED = '2026-10-23';
+const UPDATED = '2026-10-25';
 const WEBHOOK = 'https://hook.us1.make.com/zmffcg235snr2vmpwbsmb34f8yxkjihm';
 const UMAMI = { src: 'https://umami-production-2064.up.railway.app/script.js', id: '8928bb2e-46b5-4808-9945-4415a86117fb', domains: 'groupegama.ca,www.groupegama.ca' };
 

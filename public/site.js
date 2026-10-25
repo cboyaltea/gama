@@ -8,7 +8,7 @@
 
   // Suivi des clics (Umami)
   document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href]');if(!a||!window.umami)return;var h=a.getAttribute('href')||'';var d={page:location.pathname,text:(a.textContent||'').trim().slice(0,60)};
-    if(h.indexOf('tel:')===0)umami.track('clic_telephone',d);else if(h.indexOf('mailto:')===0)umami.track('clic_courriel',d);else if(h.indexOf('/demande-de-soumission')===0)umami.track('clic_soumission',d);},true);
+    if(h.indexOf('tel:')===0)umami.track('clic_telephone',d);else if(h.indexOf('mailto:')===0)umami.track('clic_courriel',d);else if(h.indexOf('/demande-de-soumission')===0||h.indexOf('/en/request-a-quote')===0)umami.track('clic_soumission',d);},true);
 
   // Formulaire
   var f=document.getElementById('quote');if(!f)return;
@@ -17,16 +17,18 @@
   function sync(){var m=sel.value==='Manutention';f.querySelectorAll('[data-when=livraison]').forEach(function(el){el.hidden=m;});f.querySelectorAll('[data-when=manutention]').forEach(function(el){el.hidden=!m;});}
   sel.addEventListener('change',sync);sync();
   var msg=f.querySelector('.form-msg');
+  var EN=(document.documentElement.lang||'').slice(0,2)==='en';
+  var M=EN?{req:'Please fill in all required fields.',mail:'Please check your email address.',sending:'Sending…',ok:'Thank you! Your request has been sent. We will get back to you quickly with a price and a date.',err:'Sorry, sending failed. Call us at 514-424-7936 or try again in a moment.'}:{req:'Merci de remplir tous les champs obligatoires.',mail:'Vérifiez votre adresse courriel.',sending:'Envoi en cours…',ok:'Merci ! Votre demande est envoyée. Nous vous répondons rapidement avec un prix et une date.',err:'Désolé, l’envoi a échoué. Appelez-nous au 514-424-7936 ou réessayez dans un instant.'};
   f.addEventListener('submit',function(e){e.preventDefault();
     var req=['Name','Email','Phone','Service','Demande'],bad=req.filter(function(n){return !f.elements[n].value.trim();});
-    if(bad.length){msg.className='form-msg err';msg.textContent='Merci de remplir tous les champs obligatoires.';f.elements[bad[0]].focus();return;}
-    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.elements.Email.value)){msg.className='form-msg err';msg.textContent='Vérifiez votre adresse courriel.';f.elements.Email.focus();return;}
-    var btn=f.querySelector('button[type=submit]');btn.disabled=true;msg.className='form-msg';msg.textContent='Envoi en cours…';
+    if(bad.length){msg.className='form-msg err';msg.textContent=M.req;f.elements[bad[0]].focus();return;}
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.elements.Email.value)){msg.className='form-msg err';msg.textContent=M.mail;f.elements.Email.focus();return;}
+    var btn=f.querySelector('button[type=submit]');btn.disabled=true;msg.className='form-msg';msg.textContent=M.sending;
     var fd=new FormData(f);var data={};fd.forEach(function(v,k){data[k]=v;});
     if(data.Service==='Manutention'){data.from=data.from_m||'';data.to='';}delete data.from_m;
-    data.page=location.pathname;
+    data.page=location.pathname;data.lang=EN?'en':'fr';
     fetch('/api/demande',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(data)}).then(function(r){return r.ok?r.json():Promise.reject(r);}).then(function(){
-      msg.className='form-msg ok';msg.textContent='Merci ! Votre demande est envoyée. Nous vous répondons rapidement avec un prix et une date.';f.reset();sync();if(window.umami)umami.track('demande_envoyee',{service:data.Service});
-    }).catch(function(){msg.className='form-msg err';msg.textContent='Désolé, l’envoi a échoué. Appelez-nous au 514-424-7936 ou réessayez dans un instant.';}).finally(function(){btn.disabled=false;});
+      msg.className='form-msg ok';msg.textContent=M.ok;f.reset();sync();if(window.umami)umami.track('demande_envoyee',{service:data.Service});
+    }).catch(function(){msg.className='form-msg err';msg.textContent=M.err;}).finally(function(){btn.disabled=false;});
   });
 })();

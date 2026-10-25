@@ -3,7 +3,7 @@
 > Groupe Gama : livraison urgente 24/7, livraison dès le lendemain, déménagement la fin de semaine, déchargement de conteneurs et livraison en marque blanche à Montréal, Laval, Rive-Nord et Rive-Sud. 25 ans d’expérience. Devis gratuit : 514-424-7936.
 
 Site : https://groupegama.ca/ — Téléphone : 514-424-7936 (7 jours sur 7). Devis gratuit : https://groupegama.ca/demande-de-soumission
-Langue : français. Zone de service : Grand Montréal (île de Montréal, Laval, Rive-Nord, Rive-Sud) au quotidien, livraison partout au Québec en planifié ou dès le lendemain. Dernière mise à jour : 2026-10-23.
+Langues : français (https://groupegama.ca/) et anglais (https://groupegama.ca/en). Zone de service : Grand Montréal (île de Montréal, Laval, Rive-Nord, Rive-Sud) au quotidien, livraison partout au Québec en planifié ou dès le lendemain. Dernière mise à jour : 2026-10-25.
 
 ## Faits clés
 - 25+ ans d’expérience
@@ -60,6 +60,21 @@ Langue : français. Zone de service : Grand Montréal (île de Montréal, Laval,
 - [Rive-Nord](https://groupegama.ca/livraison-rive-nord-montreal)
 - [Rive-Sud](https://groupegama.ca/livraison-rive-sud-montreal)
 - [Plan du site XML](https://groupegama.ca/sitemap.xml)
+
+## English
+> Groupe Gama: 24/7 urgent delivery, next-day delivery, weekend moving, container unloading and white-label delivery in Montreal, Laval, the North Shore and South Shore. 25 years of experience. Free quote: 514-424-7936.
+
+- [Home](https://groupegama.ca/en)
+- [Request a quote](https://groupegama.ca/en/request-a-quote)
+- [24/7 urgent delivery](https://groupegama.ca/en/same-day-courier-montreal) : Urgent courier and same-day delivery 24/7 in Montreal, Laval, the North Shore and South Shore, weekends and holidays included. Parcels, pallets and goods. Free quote: 514-424-7936.
+- [Next-day delivery, AM or PM](https://groupegama.ca/en/next-day-delivery-quebec) : Guaranteed next-day delivery, morning or afternoon, anywhere in Quebec from Montreal. Parcels and pallets, regular routes for businesses. Free quote: 514-424-7936.
+- [Moving services](https://groupegama.ca/en/moving-montreal) : Residential and commercial moving on weekends in Montreal, Laval, the North Shore and South Shore: equipped truck, fuel and mileage included, full insurance, moving blankets and floor protection. Free quote.
+- [Material handling services](https://groupegama.ca/en/container-unloading-montreal) : Material handlers for container unloading, palletizing and sorting of goods in Montreal, Laval and the South Shore, even on weekends. Fast, reliable service, free quote.
+- [White-label delivery](https://groupegama.ca/en/white-label-delivery) : We deliver under your name: white-label delivery service for merchants, online stores and distributors in Greater Montreal. Last-mile delivery, regular routes, free quote.
+- [Distribution services](https://groupegama.ca/en/flyer-distribution-montreal) : Door-to-door or in-store distribution of flyers, leaflets and samples in Montreal, Laval, the North Shore and South Shore. Targeting by neighbourhood, distribution report. Free quote.
+- [Greater Montreal delivery](https://groupegama.ca/en/montreal-delivery)
+- [Montreal North Shore delivery](https://groupegama.ca/en/north-shore-delivery)
+- [Montreal South Shore delivery](https://groupegama.ca/en/south-shore-delivery)
 
 ## Optionnel
 - Entreprise : Groupe Gama, transporteur et déménageur québécois, plus de 25 ans d'expérience. Services : livraison urgente 24/7, livraison dès le lendemain, déménagement la fin de semaine, déchargement de conteneurs, manutention, livraison en marque blanche.

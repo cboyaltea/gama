@@ -29,7 +29,8 @@ p{margin:0 0 1em}.wrap{max-width:var(--max);margin:0 auto;padding:0 20px}.narrow
 .burger{display:none;width:44px;height:44px;border:0;background:none;flex-direction:column;justify-content:center;gap:5px;padding:10px;cursor:pointer}.burger span{display:block;height:2px;background:var(--forest);border-radius:2px}
 .mnav{display:none;flex-direction:column;padding:10px 20px 20px;border-top:1px solid var(--line);background:#fff}.mnav strong{margin:14px 0 6px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--green)}.mnav a{padding:10px 0;color:var(--ink);font-weight:600;border-bottom:1px solid var(--line)}.mnav .btn{margin-top:16px;justify-content:center;border:0}
 #hdr.open .mnav{display:flex}
-@media(max-width:1060px){#hdr nav,.cta-top{display:none}.burger{display:flex;margin-left:auto}.tel span{display:none}.tel{margin-left:auto}}
+.lang{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:34px;padding:0 10px;border:1.5px solid var(--line);border-radius:999px;font-weight:800;font-size:13px;letter-spacing:.06em;color:var(--forest);white-space:nowrap}.lang:hover{background:var(--mint);border-color:var(--mint);text-decoration:none}.lang .lang-long{display:none}
+@media(max-width:1060px){#hdr nav,.cta-top{display:none}.burger{display:flex;margin-left:0}.tel span{display:none}.lang{margin-left:auto}}
 @media(min-width:1061px){.tel{margin-left:6px}}
 
 /* Héros */
